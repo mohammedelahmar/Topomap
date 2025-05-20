@@ -1,0 +1,63 @@
+.location-control {
+  position: relative;
+  z-index: 5;
+  margin: 10px 0;
+}
+
+.location-button {
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.location-button:hover {
+  background: #f8f8f8;
+}
+
+.location-button.locating {
+  animation: pulse 1.5s infinite;
+}
+
+.location-error {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.location-marker {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #3388ff;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(51, 136, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(51, 136, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(51, 136, 255, 0);
+  }
+}

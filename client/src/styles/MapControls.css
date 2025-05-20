@@ -1,0 +1,230 @@
+.map-controls-container {
+  position: absolute;
+  right: 10px;
+  top: 70px; /* Adjusted position to avoid overlapping with navigation controls */
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  max-width: 400px;
+  width: auto;
+}
+
+.map-controls-container.collapsed {
+  transform: translateX(calc(100% - 30px));
+}
+
+.map-controls-container:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.map-control-group {
+  border-bottom: 1px solid var(--gray-200);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+.map-control-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.map-control-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  color: var(--gray-800);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-control-title svg {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.map-control-button {
+  background-color: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius-sm);
+  color: var(--gray-700);
+  padding: 8px 12px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.map-control-button:hover {
+  background-color: var(--gray-50);
+  color: var(--gray-900);
+  border-color: var(--gray-300);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.map-control-button.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary-dark);
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+}
+
+.map-control-button.active:hover {
+  background-color: var(--primary-dark);
+}
+
+.map-search-box {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.map-search-input {
+  flex-grow: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);
+  font-size: 14px;
+  transition: all var(--transition);
+}
+
+.map-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.map-search-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-search-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.map-view-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Enhanced toggle styles */
+.map-controls-toggle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  background-color: #ff5722; /* Bright orange for high visibility */
+  color: white;
+  border: none;
+  border-radius: 6px 0 0 6px;
+  width: 30px;
+  height: 60px; /* Made taller for easier clicking */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  z-index: 999; /* Very high z-index to ensure visibility */
+  font-size: 20px; /* Larger text */
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.map-controls-toggle:hover {
+  width: 35px; /* Grow slightly on hover */
+  background-color: #e64a19;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .map-controls-container {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-controls-container {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    padding: 14px;
+  }
+  
+  .map-controls-toggle {
+    display: flex;
+  }
+  
+  .map-controls-container.collapsed {
+    height: 40px;
+    overflow: hidden;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .map-control-button {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-controls-container {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    padding: 12px;
+  }
+  
+  .map-control-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+  
+  .map-control-group {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .map-control-title {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  
+  .map-search-input,
+  .map-search-button {
+    padding: 8px 10px;
+  }
+}
+
+/* Add this at the end of your MapControls.css file */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 87, 34, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+}
+
+/* Only apply this animation when the panel is collapsed */
+.map-controls-container.collapsed .map-controls-toggle {
+  animation: pulse 2s infinite;
+}

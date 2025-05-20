@@ -1,0 +1,270 @@
+/* Navbar sections */
+.tools-section, 
+.data-section, 
+.auth-section, 
+.user-section {
+  display: flex;
+  align-items: center;
+}
+
+/* Fix tool and data section alignment */
+.tools-section, 
+.data-section {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Enhanced navbar button styles */
+.navbar button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 13px;
+  box-shadow: none;
+}
+
+.navbar button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.navbar button:active {
+  transform: translateY(0);
+}
+
+.navbar button.active {
+  background: var(--primary);
+  position: relative;
+}
+
+.navbar button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  border-radius: 1px;
+}
+
+.tool-btn, .data-btn {
+  justify-content: center;
+}
+
+.auth-btn {
+  background: var(--primary) !important;
+  padding: 6px 12px;
+  color: white;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3) !important;
+}
+
+.auth-btn:hover {
+  background: var(--primary-dark) !important;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4) !important;
+}
+
+.toggle-sidebar {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  background: white;
+  color: var(--gray-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.toggle-sidebar:hover {
+  background: white;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+/* Enhanced user section */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.user-section p {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.user-section .nav-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Fix auth section to align with user section */
+.auth-section .nav-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Button styles */
+.nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Home component styles */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Map section styles */
+.map-section {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.map-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--gray-100);
+}
+
+/* Error message styles */
+.map-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  text-align: center;
+  max-width: 400px;
+  width: calc(100% - 30px);
+  border: 1px solid var(--gray-200);
+}
+
+.map-error h3 {
+  color: var(--danger);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.map-error p {
+  margin-bottom: 1rem;
+  color: var(--gray-700);
+}
+
+.map-error button {
+  background: var(--primary);
+  color: white;
+  margin-top: 10px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .navbar-content.open {
+    padding-bottom: 20px;
+  }
+  
+  .nav-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .navbar button {
+    width: 100%;
+    padding: 10px;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  .user-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .user-section p {
+    margin-bottom: 5px;
+    width: 100%;
+    max-width: none;
+  }
+  
+  .user-section .nav-buttons,
+  .auth-section .nav-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .navbar-section {
+    margin-bottom: 15px;
+  }
+  
+  .navbar-section:last-child {
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .navbar button {
+    font-size: 11px;
+    padding: 8px;
+  }
+  
+  .user-section p {
+    font-size: 0.8rem;
+  }
+}

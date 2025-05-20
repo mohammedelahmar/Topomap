@@ -1,0 +1,28 @@
+.style-controls {
+  margin: 10px 0;
+}
+
+.style-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.style-buttons button {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.style-buttons button:hover {
+  background: #f8f8f8;
+}
+
+.style-buttons button.active {
+  background: #3b82f6;
+  color: white;
+}
