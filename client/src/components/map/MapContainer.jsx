@@ -5,15 +5,11 @@ import MapControls from './controls/MapControls';
 import FeaturePanel from './features/FeaturePanel';
 import MapInfoPanel from './info/MapInfoPanel';
 import MapLayerManager from './layers/MapLayerManager';
-import Auth from '../auth/Auth';
-import { authService } from '../../services/authService';
 import '../../styles/MapView.css';
-import '../../styles/MapContainer.css';
 
-// Set your Mapbox token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, setIsLoggedIn, onAuthSuccess }) {
+function MapContainer({ activeFeature, setActiveFeature, isLoggedIn }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [mapError, setMapError] = useState(null);
@@ -28,22 +24,18 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
     waypoints: false
   });
   const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/outdoors-v12');
-  const [authMode, setAuthMode] = useState('login'); // Default to login mode
   
-  // Initialize map
+  // Initialize map (your existing initialization code)
   useEffect(() => {
     let loadTimer = null;
     
-    // Check if token is present
     if (!mapboxgl.accessToken || mapboxgl.accessToken === 'undefined' || mapboxgl.accessToken.trim() === '') {
       setMapError("Missing Mapbox access token. Please check your environment variables.");
       return;
     }
     
-    // Don't re-initialize if map already exists
     if (map.current) return;
     
-    // Make sure the container is ready before initializing
     if (!mapContainer.current) {
       console.log("Map container not available yet.");
       return;
@@ -53,7 +45,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
       try {
         console.log("Initializing map...");
         
-        // Create map instance
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: mapStyle,
@@ -69,26 +60,21 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
 
         console.log("Map object created:", map.current);
 
-        // Set a load timeout
         loadTimer = setTimeout(() => {
           console.log("Map failed to load after timeout");
           setMapError("Map initialization timed out. Please check your connection and Mapbox token.");
-        }, 10000); // 10 second timeout
+        }, 10000);
         
-        // Wait for map to load before adding controls
         map.current.on('load', () => {
           clearTimeout(loadTimer);
           console.log('Map fully loaded');
           
-          // Add navigation control after map is loaded
           map.current.addControl(new mapboxgl.NavigationControl({
             visualizePitch: true
           }), 'bottom-right');
           
-          // Set map as loaded
           setMapLoaded(true);
 
-          // Add building layer for additional detail 
           map.current.addLayer({
             'id': '3d-buildings',
             'source': 'composite',
@@ -103,15 +89,9 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
           });
         });
 
-        // Remove the problematic satellite layer code in the style.load event handler
         map.current.on('style.load', () => {
-          // IMPORTANT: Remove all code related to satellite layer enhancement
-          // We'll handle satellite differently
-          
-          // Instead, just restore 3D terrain if enabled
           if (is3DMode && map.current.getStyle()) {
             try {
-              // Re-add terrain source if needed
               if (!map.current.getSource('mapbox-dem')) {
                 map.current.addSource('mapbox-dem', {
                   'type': 'raster-dem',
@@ -121,7 +101,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
                 });
               }
               
-              // Re-add sky layer if needed
               if (!map.current.getLayer('sky')) {
                 map.current.addLayer({
                   'id': 'sky',
@@ -134,7 +113,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
                 });
               }
               
-              // Reapply terrain
               map.current.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             } catch (err) {
               console.error('Error reapplying 3D terrain after style change:', err);
@@ -142,20 +120,16 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
           }
         });
         
-        // Handle errors with more detail
         map.current.on('error', (e) => {
           clearTimeout(loadTimer);
           console.error('Map error:', e);
           
-          // If error is related to style loading, provide more specific guidance
           if (e.error && (e.error.message.includes('style') || e.error.message.includes('source'))) {
             console.log('Style-related error detected');
-            // Try falling back to outdoors style
             if (map.current.getStyle().sprite && map.current.getStyle().sprite.includes('satellite')) {
               console.log('Error with satellite style, falling back to outdoors');
               map.current.setStyle('mapbox://styles/mapbox/outdoors-v12');
               setMapStyle('mapbox://styles/mapbox/outdoors-v12');
-              // Clear the error if style is successfully changed
               setMapError(null);
               return;
             }
@@ -164,7 +138,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
           setMapError('Error loading map. Please check your MapBox token and connection.');
         });
         
-        // Update coordinates when map moves
         map.current.on('move', () => {
           setLng(parseFloat(map.current.getCenter().lng.toFixed(4)));
           setLat(parseFloat(map.current.getCenter().lat.toFixed(4)));
@@ -178,7 +151,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
       }
     };
 
-    // Slight delay to ensure DOM is ready
     const initTimer = setTimeout(initMap, 100);
     
     return () => {
@@ -194,16 +166,14 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
         }
       }
     };
-  }, []); // Only run once on mount
-  
-  // Update map style when it changes
+  }, []);
+
   useEffect(() => {
     if (map.current && map.current.isStyleLoaded() && mapLoaded) {
       map.current.setStyle(mapStyle);
     }
   }, [mapStyle, mapLoaded]);
-  
-  // Handle file imports
+
   const handleImport = (geoJsonData) => {
     if (map.current && mapLoaded) {
       MapLayerManager.handleFileImport(map.current, geoJsonData, setRouteData, setLayers);
@@ -211,23 +181,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
       console.error("Map not ready for importing data");
     }
   };
-
-  const handleLogout = () => {
-    authService.clearAuth();
-    setIsLoggedIn(false);
-  };
-
-  const openLogin = () => {
-    setAuthMode('login');
-    setShowAuth(true);
-  };
-
-  const openRegister = () => {
-    setAuthMode('register');
-    setShowAuth(true);
-  };
-
-  const isLoggedIn = authService.isAuthenticated();
 
   return (
     <div className="map-container">
@@ -246,16 +199,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
         </div>
       )}
       
-      {/* Auth modal */}
-      {showAuth && (
-        <Auth 
-          mode={authMode} 
-          onClose={() => setShowAuth(false)} 
-          onSuccess={onAuthSuccess} 
-        />
-      )}
-      
-      {/* Add onWheel handler to prevent event propagation issues */}
       <div 
         ref={mapContainer} 
         className="map-view" 
@@ -266,24 +209,6 @@ function MapContainer({ activeFeature, setActiveFeature, showAuth, setShowAuth, 
         <>
           <MapInfoPanel lng={lng} lat={lat} zoom={zoom} />
           
-          {/* Auth buttons - moved below the MapInfoPanel to avoid conflict with coordinate search */}
-          <div className="auth-buttons">
-            {!isLoggedIn ? (
-              <>
-                <button onClick={openLogin} className="auth-button login-button">
-                  <i className="fas fa-sign-in-alt"></i> Login
-                </button>
-                <button onClick={openRegister} className="auth-button register-button">
-                  <i className="fas fa-user-plus"></i> Register
-                </button>
-              </>
-            ) : (
-              <button onClick={handleLogout} className="auth-button logout-button">
-                <i className="fas fa-sign-out-alt"></i> Logout
-              </button>
-            )}
-          </div>
-
           <MapControls 
             map={map}
             mapStyle={mapStyle}

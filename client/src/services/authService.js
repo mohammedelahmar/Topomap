@@ -19,6 +19,10 @@ export const authService = {
     }
   },
   
+  getToken: () => {
+    return localStorage.getItem('token');
+  },
+  
   setAuth: (token, userData) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -27,6 +31,13 @@ export const authService = {
   clearAuth: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+  },
+
+  updateUserInfo: (userData) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
   }
 };
 

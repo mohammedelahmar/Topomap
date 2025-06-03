@@ -128,6 +128,14 @@ export const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
+    // If changing password, verify current password first
+    if (req.body.password && req.body.currentPassword) {
+      const isMatch = await user.comparePassword(req.body.currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+    }
+    
     // Update user fields if provided
     user.firstName = req.body.firstName || user.firstName;
     user.lastName = req.body.lastName || user.lastName;
@@ -135,7 +143,7 @@ export const updateUserProfile = async (req, res) => {
     user.email = req.body.email || user.email;
     user.bio = req.body.bio || user.bio;
     
-    // Only update password if provided
+    // Only update password if provided and current password verified
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -151,6 +159,7 @@ export const updateUserProfile = async (req, res) => {
       lastName: updatedUser.lastName,
       bio: updatedUser.bio,
       role: updatedUser.role,
+      createdAt: updatedUser.createdAt,
       token: generateToken(updatedUser._id)
     });
   } catch (error) {

@@ -205,3 +205,128 @@ export const getElevation = async (req, res) => {
     res.status(500).json({ message: 'Error fetching elevation data', error: error.message });
   }
 };
+
+// Get all markers for a specific map
+export const getMarkers = async (req, res) => {
+  try {
+    const { mapId } = req.params;
+    const map = await MapData.findById(mapId);
+    
+    if (!map) {
+      return res.status(404).json({ message: 'Map not found' });
+    }
+    
+    // Check if user has permission to view private maps
+    if (!map.isPublic && (!req.user || map.owner.toString() !== req.user.id)) {
+      return res.status(403).json({ message: 'You do not have permission to view this map\'s markers' });
+    }
+    
+    res.status(200).json(map.markers);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving markers', error: error.message });
+  }
+};
+
+// Add a new marker to a map
+export const addMarker = async (req, res) => {
+  try {
+    const { mapId } = req.params;
+    const markerData = req.body;
+    
+    if (!markerData || !markerData.location || !markerData.title) {
+      return res.status(400).json({ message: 'Marker data must include location and title' });
+    }
+    
+    const map = await MapData.findById(mapId);
+    
+    if (!map) {
+      return res.status(404).json({ message: 'Map not found' });
+    }
+    
+    // Check if user has permission
+    if (!req.user || map.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You do not have permission to modify this map' });
+    }
+    
+    // Add the marker
+    map.markers.push(markerData);
+    const updatedMap = await map.save();
+    
+    // Return the newly created marker
+    const newMarker = updatedMap.markers[updatedMap.markers.length - 1];
+    res.status(201).json(newMarker);
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding marker', error: error.message });
+  }
+};
+
+// Update a marker
+export const updateMarker = async (req, res) => {
+  try {
+    const { mapId, markerId } = req.params;
+    const updates = req.body;
+    
+    const map = await MapData.findById(mapId);
+    
+    if (!map) {
+      return res.status(404).json({ message: 'Map not found' });
+    }
+    
+    // Check if user has permission
+    if (!req.user || map.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You do not have permission to modify this map' });
+    }
+    
+    // Find the marker to update
+    const markerIndex = map.markers.findIndex(m => m._id.toString() === markerId);
+    
+    if (markerIndex === -1) {
+      return res.status(404).json({ message: 'Marker not found' });
+    }
+    
+    // Update marker fields
+    Object.keys(updates).forEach(key => {
+      if (key !== '_id' && key !== 'createdAt') {
+        map.markers[markerIndex][key] = updates[key];
+      }
+    });
+    
+    map.markers[markerIndex].updatedAt = Date.now();
+    
+    const updatedMap = await map.save();
+    res.status(200).json(updatedMap.markers[markerIndex]);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating marker', error: error.message });
+  }
+};
+
+// Delete a marker
+export const deleteMarker = async (req, res) => {
+  try {
+    const { mapId, markerId } = req.params;
+    
+    const map = await MapData.findById(mapId);
+    
+    if (!map) {
+      return res.status(404).json({ message: 'Map not found' });
+    }
+    
+    // Check if user has permission
+    if (!req.user || map.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You do not have permission to modify this map' });
+    }
+    
+    // Find and remove the marker
+    const initialLength = map.markers.length;
+    map.markers = map.markers.filter(m => m._id.toString() !== markerId);
+    
+    if (map.markers.length === initialLength) {
+      return res.status(404).json({ message: 'Marker not found' });
+    }
+    
+    await map.save();
+    res.status(200).json({ message: 'Marker deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting marker', error: error.message });
+  }
+};

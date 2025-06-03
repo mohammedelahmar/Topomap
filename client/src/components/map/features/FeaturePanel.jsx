@@ -1,7 +1,8 @@
 import React from 'react';
 import MeasurementTool from '../tools/MeasurementTool';
 import FileImport from '../tools/FileImport';
-import ExportTool from '../tools/ExportTool';  // Add this import
+import ExportTool from '../tools/ExportTool';
+import CustomMarkerTool from '../tools/CustomMarkerTool';  // Add this import
 import '../../../styles/FeaturePanel.css';
 
 function FeaturePanel({ activeFeature, setActiveFeature, map, routeData, onImport }) {
@@ -31,8 +32,9 @@ function FeaturePanel({ activeFeature, setActiveFeature, map, routeData, onImpor
             </div>
           );
         case 'export':
-          // Replace placeholder with actual ExportTool component
           return <ExportTool map={map} />;
+        case 'markers': // Add this case
+          return <CustomMarkerTool map={map} />;
         default:
           return <div>Select a feature to get started</div>;
       }

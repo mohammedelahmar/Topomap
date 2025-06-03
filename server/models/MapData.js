@@ -12,6 +12,40 @@ const pointSchema = new mongoose.Schema({
   }
 });
 
+const markerSchema = new mongoose.Schema({
+  location: {
+    type: pointSchema,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String
+  },
+  icon: {
+    type: String, 
+    enum: ['pin', 'star', 'flag', 'info', 'warning'],
+    default: 'pin'
+  },
+  color: {
+    type: String,
+    default: '#3887BE'
+  },
+  image: {
+    type: String // Base64 or URL
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const featureSchema = new mongoose.Schema({
   type: {
     type: String,
@@ -69,6 +103,7 @@ const mapDataSchema = new mongoose.Schema({
     default: 10
   },
   features: [featureSchema],
+  markers: [markerSchema], // Add markers array to the schema
   tags: [String],
   createdAt: {
     type: Date,

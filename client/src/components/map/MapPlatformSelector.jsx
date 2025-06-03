@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import MapContainer from './MapContainer';
 import GoogleMapContainer from './GoogleMapContainer';
+import  '../../styles/MapPlatformSelector.css'; // Assuming you have a CSS file for styles
 
-function MapPlatformSelector({ activeFeature, setActiveFeature, showAuth, setShowAuth, setIsLoggedIn, onAuthSuccess }) {
+function MapPlatformSelector({ activeFeature, setActiveFeature, isLoggedIn }) {
   const [mapPlatform, setMapPlatform] = useState(() => {
-    // Get from localStorage or default to 'mapbox'
     return localStorage.getItem('preferredMapPlatform') || 'mapbox';
   });
   
-  // Save preference when changed
   useEffect(() => {
     localStorage.setItem('preferredMapPlatform', mapPlatform);
   }, [mapPlatform]);
@@ -34,19 +33,13 @@ function MapPlatformSelector({ activeFeature, setActiveFeature, showAuth, setSho
         <MapContainer 
           activeFeature={activeFeature}
           setActiveFeature={setActiveFeature}
-          showAuth={showAuth}
-          setShowAuth={setShowAuth}
-          setIsLoggedIn={setIsLoggedIn}
-          onAuthSuccess={onAuthSuccess}
+          isLoggedIn={isLoggedIn}
         />
       ) : (
         <GoogleMapContainer 
           activeFeature={activeFeature}
           setActiveFeature={setActiveFeature}
-          showAuth={showAuth}
-          setShowAuth={setShowAuth}
-          setIsLoggedIn={setIsLoggedIn}
-          onAuthSuccess={onAuthSuccess}
+          isLoggedIn={isLoggedIn}
         />
       )}
     </div>

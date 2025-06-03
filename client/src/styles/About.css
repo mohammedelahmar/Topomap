@@ -1,0 +1,186 @@
+.about-page {
+  padding: 20px;
+  background-color: var(--light);
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+  color: var(--gray-800);
+  overflow-y: auto; /* Add this to enable vertical scrolling */
+}
+
+.about-container {
+  max-width: 900px;
+  width: 100%;
+  padding: 30px;
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow);
+  margin: 20px 0;
+}
+
+.about-container h1 {
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 700;
+  border-bottom: 2px solid var(--gray-200);
+  padding-bottom: 15px;
+}
+
+.about-section {
+  margin-bottom: 40px;
+}
+
+.about-section h2 {
+  color: var(--gray-800);
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+  position: relative;
+  padding-left: 15px;
+}
+
+.about-section h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 80%;
+  width: 4px;
+  background-color: var(--primary);
+  border-radius: 2px;
+}
+
+.developer-info {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gray-200);
+}
+
+.developer-content h3 {
+  margin-top: 0;
+  color: var(--primary);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.feature-card {
+  background-color: var(--gray-50);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gray-200);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.feature-card h3 {
+  color: var(--primary);
+  margin-top: 0;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  margin: 0;
+  color: var(--gray-700);
+}
+
+.tech-stack {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+.tech-stack li {
+  margin-bottom: 8px;
+}
+
+.contact {
+  text-align: center;
+}
+
+.contact-button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background-color: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.contact-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .about-container {
+    padding: 20px;
+  }
+  
+  .about-container h1 {
+    font-size: 2rem;
+  }
+  
+  .about-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .developer-info {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-page {
+    padding: 10px;
+  }
+  
+  .about-container {
+    padding: 15px;
+    margin: 10px 0;
+  }
+  
+  .about-container h1 {
+    font-size: 1.8rem;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .about-section h2 {
+    font-size: 1.3rem;
+  }
+  
+  .developer-content h3 {
+    font-size: 1.3rem;
+  }
+  
+  .feature-card {
+    padding: 15px;
+  }
+}

@@ -35,6 +35,12 @@ function FeatureButtons({
         📤 Export
       </button>
       <button 
+        className={activeFeature === 'markers' ? 'active' : ''}
+        onClick={() => setActiveFeature(activeFeature === 'markers' ? null : 'markers')}
+      >
+        📍 Markers
+      </button>
+      <button 
         className={is3DMode ? 'active' : ''}
         onClick={toggle3DTerrain}
       >

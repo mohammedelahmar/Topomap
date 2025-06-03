@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import * as toGeoJSON from '@mapbox/togeojson';
+import tokml from 'tokml';
 import '../../../styles/ExportTool.css';
 
 function ExportTool({ map }) {
@@ -588,7 +589,7 @@ function ExportTool({ map }) {
     return samples;
   };
 
-  // Export current features as KML
+  // Export map data as KML
   const exportKML = useCallback(async () => {
     if (!map?.current) {
       setExportError('Map not available');
@@ -598,40 +599,103 @@ function ExportTool({ map }) {
     try {
       setIsExporting(true);
       setExportError(null);
-
-      // Get all rendered features
-      const features = map.current.queryRenderedFeatures({
-        layers: document.getElementById('include-all-layers').checked ? undefined : 
-                [document.getElementById('kml-layer-select').value]
-      });
-
-      // Convert to GeoJSON
-      const geojsonObj = {
+      
+      // Collect all features from the map
+      const features = [];
+      
+      // Get drawn features if available
+      if (map.current.getStyle() && map.current.getSource('mapbox-gl-draw-cold')) {
+        try {
+          // Try to get MapboxDraw features
+          const drawFeatures = map.current.querySourceFeatures('mapbox-gl-draw-cold');
+          if (drawFeatures && drawFeatures.length) {
+            drawFeatures.forEach(feature => {
+              // Filter out helper features
+              if (feature.properties && feature.properties.user_has_property) {
+                features.push({
+                  type: 'Feature',
+                  geometry: feature.geometry,
+                  properties: {
+                    name: `Feature ${features.length + 1}`,
+                    description: feature.properties.user_description || ''
+                  }
+                });
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Could not get draw features", err);
+        }
+      }
+      
+      // Add marker features
+      try {
+        if (map.current.getSource('markers-source')) {
+          const markerFeatures = map.current.querySourceFeatures('markers-source', {
+            sourceLayer: undefined
+          });
+          
+          markerFeatures.forEach(feature => {
+            if (feature.properties && !feature.properties.cluster) {
+              features.push({
+                type: 'Feature',
+                geometry: feature.geometry,
+                properties: {
+                  name: feature.properties.title || 'Marker',
+                  description: feature.properties.description || ''
+                }
+              });
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Could not get marker features", err);
+      }
+      
+      // If we have any imported GeoJSON data saved
+      if (window._lastGeoJsonData) {
+        try {
+          window._lastGeoJsonData.features.forEach(feature => {
+            features.push(feature);
+          });
+        } catch (err) {
+          console.warn("Error adding imported features", err);
+        }
+      }
+      
+      // Create a GeoJSON FeatureCollection
+      const geojson = {
         type: 'FeatureCollection',
-        features: features.map(f => ({
-          type: 'Feature',
-          geometry: f.geometry,
-          properties: f.properties
-        }))
+        features: features
       };
-
-      // You need to convert GeoJSON to KML on the server side
-      // For this demo, we'll use blob URL
-      const blob = new Blob([JSON.stringify(geojsonObj)], { type: 'application/json' });
+      
+      // Convert GeoJSON to KML
+      const kml = tokml(geojson, {
+        documentName: 'Map Export',
+        documentDescription: 'Exported from Topomap',
+        name: 'name',
+        description: 'description'
+      });
+      
+      // Create and download file
+      const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `map_export_${new Date().toISOString().replace(/[:\.]/g, '-')}.geojson`;
-      link.innerHTML = 'In a full implementation, this would download a KML file';
+      link.download = `map_export_${new Date().toISOString().replace(/[:.]/g, '-')}.kml`;
+      
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      alert('For KML conversion, you would need server-side processing with a library like tokml or @mapbox/togeojson. This demo saves as GeoJSON instead.');
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 100);
+      
     } catch (error) {
       console.error('Error exporting KML:', error);
-      setExportError(`Export failed: ${error.message}`);
+      setExportError(`Failed to export KML: ${error.message}`);
     } finally {
       setIsExporting(false);
     }
@@ -909,29 +973,24 @@ function ExportTool({ map }) {
             <h4>KML Export Options</h4>
             
             <div className="option-group">
-              <div className="checkbox">
-                <input type="checkbox" id="include-all-layers" defaultChecked />
-                <label htmlFor="include-all-layers">Include all visible layers</label>
-              </div>
+              <p>Export map data as KML file for use with Google Earth and other GIS applications.</p>
             </div>
             
             <div className="option-group">
-              <label htmlFor="kml-layer-select">Or select specific layer:</label>
-              <select id="kml-layer-select" disabled={document.getElementById('include-all-layers')?.checked}>
-                <option value="">Select a layer</option>
-                {/* Dynamically populated would be better */}
-                <option value="imported-data-layer">Imported Route</option>
-                <option value="imported-waypoints">Waypoints</option>
-              </select>
+              <button 
+                className="export-button" 
+                onClick={exportKML}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Exporting...' : 'Export KML'}
+              </button>
             </div>
             
-            <button 
-              className="export-button" 
-              onClick={exportKML}
-              disabled={isExporting}
-            >
-              {isExporting ? 'Generating...' : 'Export KML'}
-            </button>
+            <div className="option-group">
+              <p className="note">
+                KML export includes all visible markers, routes, and measurements on the map.
+              </p>
+            </div>
           </div>
         );
         
